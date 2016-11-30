@@ -34,3 +34,18 @@ var(apply(l,2,mean))
 ## 2. Validation 
 
 Compare $\sum_i (s_i-ccp_i)^2$ with $\sum_i (\hat{ccp}_i-ccp_i)^2$
+
+
+
+## 30/11/16
+
+## Another way to measure smoothing performance:
+- Two Spearman's rank correlation tests to compare correlation between ranking of $\hat{cpp}$ and of $cpp$ and between ranking of $s$ and $cpp$.
+
+## To do:
+- Bibliographic research: how does official statistics deal with this small area - big variance problem? 
+- If we want to establish list of most criminal cities: FDR.
+- If we want to take into account the fact that biggest cities should be more criminal (more economic interests, density....), or at least that there is a linear relation between size and cpp, and other covariates: beta binomial regression and hierarchical empirial Bayes. 
+- Mixture of Betas (See also Etienne's exercice?)
+- James-Stein estimation (example of non-Bayesian point estimate shrinkage)
+
