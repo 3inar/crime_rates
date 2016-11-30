@@ -1,0 +1,89 @@
+---
+title: "Simulation"
+author: "Einar Holsbø"
+date: "5 October 2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir="..")
+```
+```{r, include=F}
+library(ProjectTemplate); load.project()  # load project
+```
+# Q: should one simulate from a single common crime rate or several different ones?
+If we're going to simulate a year of crime rates per person (pp.) it's sensible 
+to look at how the crime rates pp. are distributed for each year. We have
+data from 2008 to 2014. In the below plot the coloms are some of the years we have data for,
+top row is observed crime rates that year $\{\lambda_i\}$, 
+middle row is to simulate from the observed crime rates by 
+$\hat{cpp_i} = c_i/p_i$, with $c_i \sim Pois(\lambda_i)$, and the bottom row is
+the same as the middle but with the common crime rate $c_i \sim Pois(median(\{\lambda_i\}))$
+```{r}
+years <- as.character(2011:2014)
+total_c <- total_crime() 
+total_c %<>% mutate(rate=reports/population)
+
+par(mfcol=c(3,length(years)))
+for (y in years) {
+  total_c %>% filter(year==y) %>% select(rate) %>% t %>% density %>% plot(main="")
+  total_c %>% filter(year==y) %>% 
+              mutate(rate=simulate_crimes(population, rate)/population) %>%
+              select(rate) %>% t %>% density %>% plot(main="")
+  total_c %>% filter(year==y) %>% 
+              mutate(rate=simulate_crimes(population, median(rate))/population) %>%
+              select(rate) %>% t %>% density %>% plot(main="")
+}
+```
+
+Clearly it's no good to simulate from a single common crime rate. We'll use the
+observed crime rates. To ameliorate the fact that there's probably a lot of variance
+in the observed crime rates from a given year, we'll use the mean rate from all years
+as ground truth in our simulations.
+
+The "true" populations & crime rates:
+
+```{r}
+towns <- mean_crimes()
+
+plot(towns, pch=20)
+```
+
+## Evaluation of smoothing
+Let's draw from the simulated truth thousands of times and see where this lands
+us in terms of errors.
+```{r}
+errors <- raply(10000, {
+  towns %<>% mutate(crimes=simulate_crimes(towns$population, towns$cpp), raw_est=crimes/population)
+  
+  mu <- mean(towns$raw_est)
+  sigsq <- var(towns$raw_est)
+  alpha_p <- ((1 - mu) / sigsq - 1 / mu) * mu ^ 2
+  beta_p <- alpha_p * (1 / mu - 1)
+  
+  towns %<>% mutate(smoothed_est=(crimes+alpha_p)/(population+alpha_p+beta_p))
+  
+  error_raw <- mean(abs(towns$raw_est - towns$cpp))
+  error_smooth <- mean(abs(towns$smoothed_est - towns$cpp))
+  c(raw=error_raw, smooth=error_smooth)
+})
+
+plot(density(errors[,2]), col="red")
+abline(v=mean(errors[, 2]), col="red")
+
+lines(density(errors[, 1]))
+abline(v=mean(errors[, 1]))
+```
+Smoothed estimates in red, there is evidence that, on average, there's 
+a lower error for the smoothing. 
+
+# Evaluation of updating estimate year by year
+TODO:
+
+* Spearman rank correlation for raw estimates vs adjusted.
+* Local FDR-based rankings?
+* Simulate from ground truth n times to create n virtual years
+* Estimate prior either from all years or from first year
+* Update estimates year by year by using the posterior from one year as prior for the next
+
