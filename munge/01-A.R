@@ -41,7 +41,8 @@ colnames(population) <- c("place", "year", "population")
 # there are some entries where the name of the town is for some reason missing,
 # these will have population 0. Let's just remove them
 norwegian_crime <- left_join(crime_reports, population) %>% na.omit %>%
-                   filter(population > 0)
+                   filter(population > 0) %>%
+                   filter(crime_type != "Alle lovbruddsgrupper")
 
 # cleanup
 rm(crime_reports)
