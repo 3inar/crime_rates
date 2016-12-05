@@ -78,12 +78,4 @@ abline(v=mean(errors[, 1]))
 Smoothed estimates in red, there is evidence that, on average, there's 
 a lower error for the smoothing. 
 
-# Evaluation of updating estimate year by year
-TODO:
-
-* Spearman rank correlation for raw estimates vs adjusted.
-* Local FDR-based rankings?
-* Simulate from ground truth n times to create n virtual years
-* Estimate prior either from all years or from first year
-* Update estimates year by year by using the posterior from one year as prior for the next
 

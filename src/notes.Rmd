@@ -45,7 +45,9 @@ Compare $\sum_i (s_i-ccp_i)^2$ with $\sum_i (\hat{ccp}_i-ccp_i)^2$
 ## To do:
 - Bibliographic research: how does official statistics deal with this small area - big variance problem? 
 - If we want to establish list of most criminal cities: FDR.
+- Spearman rank correlation for top lists from raw estimates vs adjusted.
 - If we want to take into account the fact that biggest cities should be more criminal (more economic interests, density....), or at least that there is a linear relation between size and cpp, and other covariates: beta binomial regression and hierarchical empirial Bayes. 
 - Mixture of Betas (See also Etienne's exercice?)
 - James-Stein estimation (example of non-Bayesian point estimate shrinkage)
+- Historical information: use rates from earlier years to estimate rates this year
 
