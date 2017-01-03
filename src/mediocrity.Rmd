@@ -30,13 +30,13 @@ years <- violence %>% spread(year, rate)
 # maybe this can be done prettier......
 p_1 <- ggplot(years) + aes(x=`2010`, y=`2011`) + geom_point(color="grey50") +
   stat_smooth(method = "lm", se = TRUE) + geom_abline(slope=1, intercept=0) +
-  geom_abline(slope=0, intercept=mean(violence$rate)) 
+  geom_abline(slope=0, intercept=mean(violence$rate)) + ylim(0,0.02) + xlim(0,0.02)
 p_2 <- ggplot(years) + aes(x=`2011`, y=`2012`) + geom_point(color="grey50") +
   stat_smooth(method = "lm", se = TRUE) + geom_abline(slope=1, intercept=0) +
-  geom_abline(slope=0, intercept=mean(violence$rate)) 
+  geom_abline(slope=0, intercept=mean(violence$rate)) + ylim(0,0.02) + xlim(0,0.02)
 p_3 <- ggplot(years) + aes(x=`2012`, y=`2013`) + geom_point(color="grey50") +
   stat_smooth(method = "lm", se = TRUE) + geom_abline(slope=1, intercept=0) +
-  geom_abline(slope=0, intercept=mean(violence$rate)) 
+  geom_abline(slope=0, intercept=mean(violence$rate)) + ylim(0,0.02) + xlim(0,0.02)
 
 library(gridExtra)
 grid.arrange(p_1, p_2, p_3, ncol=3)
@@ -101,3 +101,11 @@ ggplot(years) +
   stat_smooth(aes(`2012`, `2013`), method="lm", color="black", se = F) +
   stat_smooth(aes(`2012s`, `2013s`), method="lm", color="blue") 
 ```
+
+Rather then comparing the slopes of the regression lines, we can compare the correlations: the closer to 1 the correlation gets, the weaker the 'regression to the mean' phenomen is. And indeed correlation is higher for the shrinked rates:
+
+```{r}
+cor(years$`2012`,years$`2013`,use='complete')
+cor(years$`2012s`,years$`2013s`,use='complete')
+```
+This is not proper testing, but it is very reasonable because outliers are pushed towards the other point by the shrinking. 
