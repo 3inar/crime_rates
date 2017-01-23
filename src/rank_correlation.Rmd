@@ -1,0 +1,44 @@
+---
+title: "Rank correlation of top lists"
+author: "Einar Holsbø"
+date: "23 January 2017"
+output: pdf_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir="..")
+```
+```{r, include=F}
+library(ProjectTemplate); load.project()  # load project
+```
+
+# Are top lists "truer" in smoothed data vs raw estimates?
+```{r}
+library(plyr)
+
+towns <- mean_crimes()
+
+ranks <- raply(10000, {
+  towns %<>% mutate(crimes=simulate_crimes(towns$population, towns$cpp), raw_est=crimes/population)
+  
+  mu <- mean(towns$raw_est)
+  sigsq <- var(towns$raw_est)
+  alpha_p <- ((1 - mu) / sigsq - 1 / mu) * mu ^ 2
+  beta_p <- alpha_p * (1 / mu - 1)
+  
+  towns %<>% mutate(smoothed_est=(crimes+alpha_p)/(population+alpha_p+beta_p))
+  
+  cor_raw <- cor(towns$raw_est, towns$cpp, method="spearman")
+  cor_smooth <- cor(towns$smoothed_est, towns$cpp)
+  c(raw=cor_raw, smooth=cor_smooth)
+})
+
+
+plot(density(ranks[,2]), col="red", xlim=c(.95, 1), main="Rank correlation", sub="10 000 simulations")
+abline(v=mean(ranks[, 2]), col="red")
+
+lines(density(ranks[, 1]))
+abline(v=mean(ranks[, 1]))
+```
+
+Smoothed in red. This is a lot better!
