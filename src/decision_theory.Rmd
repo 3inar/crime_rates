@@ -14,7 +14,7 @@ We measure the \textit{global} discrepancy between the fixed crime statistics $\
 $$
 L(\mbox{cpp},\hat{\mbox{cpp}}^s)=\sum_{i=1}^n(\mbox{cpp}_i-\hat{\mbox{cpp}}^s_i)^2
 $$
-In particular we are interested in the risk $E(L(\mbox{cpp},\hat{\mbox{cpp}}^s))=MSE(\mbox{cpp},\hat{\mbox{cpp}}^s)$. Let $f(n;\mbox{cpp})$ be the likelihood, where $n=(n_1,\ldots,n_m)$ are the (observed) number of crimes reported. According to our model we have: 
+In particular we are interested in the risk function $E(L(\mbox{cpp},\hat{\mbox{cpp}}^s))=MSE(\mbox{cpp},\hat{\mbox{cpp}}^s)$. Let $f(n;\mbox{cpp})$ be the likelihood, where $n=(n_1,\ldots,n_m)$ are the (observed) number of crimes reported. According to our model we have: 
 $$
 \begin{split}
 f(n;\mbox{cpp}) & = \prod_{i=1}^m \frac{e^{-\lambda_i}\lambda_i^{n_i}}{n_i!} \\
