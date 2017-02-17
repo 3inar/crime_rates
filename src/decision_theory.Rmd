@@ -1,0 +1,202 @@
+---
+title: "Do shrinkage estimates dominates raw estimates?"
+date: "11 February 2017"
+output: pdf_document
+---
+
+I use the same notations as in the Overleaf draft and in the 'Decision theory' chapter of Wasserman's 'All of Statistics'.
+
+# 1. Theoretical considerations
+
+## 1.1 Risk of $\hat{\mbox{cpp}}^s$
+
+We measure the \textit{global} discrepancy between the fixed crime statistics $\mbox{cpp}=(\mbox{cpp}_i)_{i=1,\ldots,n}$ and estimators $\hat{\mbox{cpp}}^s=(\hat{\mbox{cpp}}_i^s)_{i=1,\ldots,n}$ by means of the loss function
+$$
+L(\mbox{cpp},\hat{\mbox{cpp}}^s)=\sum_{i=1}^n(\mbox{cpp}_i-\hat{\mbox{cpp}}^s_i)^2
+$$
+In particular we are interested in the risk $E(L(\mbox{cpp},\hat{\mbox{cpp}}^s))=MSE(\mbox{cpp},\hat{\mbox{cpp}}^s)$. Let $f(n;\mbox{cpp})$ be the likelihood, where $n=(n_1,\ldots,n_m)$ are the (observed) number of crimes reported. According to our model we have: 
+$$
+\begin{split}
+f(n;\mbox{cpp}) & = \prod_{i=1}^m \frac{e^{-\lambda_i}\lambda_i^{n_i}}{n_i!} \\
+                & = \prod_i \frac{e^{-\mbox{cpp}_i \times \mbox{size}_i}(\mbox{cpp}_i \times \mbox{size}_i)^{n_i}}{n_i!}
+\end{split}
+$$
+The risk is 
+$$
+\begin{split}
+R(\mbox{cpp},\hat{\mbox{cpp}}^s) & = \int L(\mbox{cpp},\hat{\mbox{cpp}}^s) f(n;\mbox{cpp}) dn \\
+                                 & = \int \sum_{i=1}^n \left(\mbox{cpp}_i-\frac{\alpha+n_i}{\alpha+ \beta +\mbox{size}_i}\right)^2 f(n;\mbox{cpp}) dn 
+\end{split}
+$$
+where $\alpha$ and $\beta$ depend on $n_1,\ldots,n_m$:
+$$
+\beta = \frac{\alpha(1-\hat{\mu})}{\hat{\mu}}
+$$
+and 
+$$
+\alpha = \left(\frac{1-\hat{\mu}}{S^2}-\frac{1}{\hat{\mu}}\right)\hat{\mu}^2
+$$
+with $\hat{\mu}=\frac{\sum_i\hat{\mbox{cpp}}_i}{m}$ and $S^2=\frac{\sum_i(\hat{\mbox{cpp}}_i-\hat{\mu})^2}{m-1}$ the __sample__ mean and variance of the observed crime rates (ie of the _raw_ estimates $\frac{n_i}{\mbox{size}_i}$). Note that this integral is with respect to $n_1,\ldots,n_m$.
+
+__Some remarks:__
+
+- When we tried to compute the risk on the board in my office, we took $\alpha$ and $\beta$ as fixed. This is wrong, because they depend on the integration variables!
+- As far as I remember we took $n_i\sim\mathcal{P}(\mbox{cpp}_i \times \mbox{size}_i)$ to make the risk computation easier. But our computation was wrong in any case, so maybe we can relax this assumption and take a binomial?
+
+## 1.2 Risk of $\hat{\mbox{cpp}}$
+
+With regards to the discrepancy between $\mbox{cpp}$ and $\hat{\mbox{cpp}}=(\hat{\mbox{cpp}}_i)_{i=1,\ldots,n}$, we have
+$$
+L(\mbox{cpp},\hat{\mbox{cpp}})=\sum_{i=1}^n(\mbox{cpp}_i-\hat{\mbox{cpp}}_i)^2
+$$
+The risk is
+$$
+\begin{split}
+R(\mbox{cpp},\hat{\mbox{cpp}}) = MSE(\mbox{cpp},\hat{\mbox{cpp}}) & = E(L(\mbox{cpp},\hat{\mbox{cpp}})) \\
+                               &=\int L(\mbox{cpp},\hat{\mbox{cpp}}) f(n;\mbox{cpp}) dn \\
+                               & = \int \sum_{i=1}^n \left(\mbox{cpp}_i-\frac{n_i}{\mbox{size}_i}\right)^2 f(n;\mbox{cpp}) dn 
+\end{split}
+$$
+where the likelihood is the same as above. __I have not tried__ to find solutions to these integrals, in the following I rather calculate MC estimates.
+
+
+## 1.3 Stein's paradox
+
+We have a Stein paradox if _for every choice of_ $\mbox{cpp}$:
+$$
+R(\mbox{cpp},\hat{\mbox{cpp}^s}) \leq R(\mbox{cpp},\hat{\mbox{cpp}})
+$$
+and the inequality is strict for at least one choice of $\mbox{cpp}$. If this holds true we say that $\hat{\mbox{cpp}^s}$ dominates $\hat{\mbox{cpp}}$.   
+
+Proving that $\hat{\mbox{cpp}^s}$ dominates $\hat{\mbox{cpp}}$ requires manipulating the integrals above, which does not look very appealing (but I have not tried!). What we can easily do is to find MC estimates for a given choice of $\mbox{cpp}$ and see what happens. _Einar has already done all this, but I was not able to find all the necessary code chunks in github...._ 
+
+
+# 2. Data
+
+I use the code published in Einar's blog to load and munge the data.
+
+```{r,warning=F,message=F,eval=T}
+library(tidyverse)
+library(stringr)
+library(rjstat)
+
+violence_url <-"http://data.ssb.no/api/v0/dataset/81194.json?lang=no"
+population_url <- "http://data.ssb.no/api/v0/dataset/26975.json?lang=no"
+  
+# fetch crime reports
+v <- violence_url %>% fromJSONstat %>% as.data.frame
+
+# colnames have the format [long table name].variable, extract the last bit
+colnames(v) <- gsub("^(.*[.])", "", colnames(v))
+
+# n.o. reports and n.o. reports per 1000 citizens in same column, separate them
+# with tidyr, rename new columns. the year column contains ranges like
+# 2007-2008, which we'll translate to a single year
+tid_new <- v$tid %>% str_split("-")
+v <- spread(v, statistikkvariabel, value) %>% 
+     mutate(tid=str_split(tid, pattern="-", simplify=T)[, 2])
+colnames(v)[c(1,4,5)] = c("sted", "anmeldelser", "anmeldelser_pk")
+
+# fetch population numbers
+p <- population_url %>% fromJSONstat %>% as.data.frame
+colnames(p) <- gsub("^(.*[.])", "", colnames(p))
+p <- spread(p, statistikkvariabel, value)
+
+# change names so that we ca join the two tables on "sted" and "tid"
+colnames(p)[1] <- "sted"
+colnames(p)[3] <- "personer"
+
+crimes <- left_join(v, p)
+
+# filter out anything that isn't violence in 2014. Additionally, some of the
+# entries have population 0, so let's remove them. Order by crimes/1000,
+# descending
+violence14 <- crimes %>% filter(tid=="2014", lovbruddstype=="Voldskriminalitet") %>%
+              filter(sted != "Alle kommuner", personer > 0) %>%
+              select(-lovbruddstype, -tid) %>% 
+              na.omit %>% 
+              arrange(desc(anmeldelser_pk))
+```
+
+I compute the observed crime rate `cpp`:
+
+```{r,eval=T}
+violence14 <- mutate(violence14, cpp=anmeldelser/personer)
+```
+
+# 3. Simulations
+
+I follow the scheme in the Overleaf draft. In particular, for each city $i$ in 2014 
+
+- fix crime rate per person $cpp_i$ 
+- compute expected number of crimes $\lambda_i=cpp_i \times size_i$ (I directly take `violence14$anmeldelser`)
+- sample $N_i\sim\mathcal{P}(\lambda_i)$ thus obtaining observation $n_i$ (as $size_i$ is large and $cpp_i$ is small, this should be equivalent to sampling $\mathcal{B}(size_i,cpp_i)$) 
+
+I simulate $N=100$ replicates, each consisting of a column of crime rates. 
+
+```{r,eval=T}
+N=100
+sim=c()
+for(i in 1:N) sim=cbind(sim,rpois(n=length(violence14$sted),lambda=violence14$anmeldelser))
+```
+
+
+# 4. Global risk of the MLE estimators $\hat{\mbox{cpp}}$ 
+
+For each replicate, I compute the frequentist estimates of the crime rates and the loss fonction $L(cpp,\hat{cpp})$
+
+```{r,eval=T}
+raw_est <- apply(sim,2,function(x) x/violence14$personer ) 
+loss_raw_est <- apply(raw_est,2,function(x) sum((x-violence14$cpp)^2) ) 
+```
+
+We compute the MC estimate of the risk associeted to this loss function by averaging the loss fonction over all the replicates:
+```{r,eval=T}
+mean(loss_raw_est)
+```
+
+# 5. Global risk of the shrinkage estimator $\hat{\mbox{cpp}^s}$ 
+
+For each replicate I compute the _shrinked estimate._
+
+```{r,eval=T}
+shrink=function(ncrimes,pop){
+  raw_est <- ncrimes/pop
+  mu <- mean(raw_est)
+  ssq <- var(raw_est)
+  # fit beta prior by method of moments
+  alpha_p <- ((1 - mu) / ssq - 1 / mu) * mu ^ 2
+  beta_p <- alpha_p * (1 / mu - 1)
+  return( (ncrimes+alpha_p)/(pop+alpha_p+beta_p) )
+}
+
+shrink_est <-c()
+for(i in 1:N) shrink_est <- cbind(shrink_est,shrink(ncrimes=sim[,i],pop=violence14$personer))
+```
+
+Then, for each replicate I compute the loss function and the MC estimate of the risk
+
+```{r,eval=T}
+L_shrink_est <- apply(shrink_est,2,function(x) sum((x-violence14$cpp)^2)) 
+mean(L_shrink_est)
+```
+
+
+# 6. Discussion
+
+We proved empirically that the shrink estimates globally have lower risk than the raw estimates for this particular choice of cpp. 
+
+In order to prove that $\hat{\mbox{cpp}^s}$ dominates $\hat{\mbox{cpp}}$ we need to prove that for each choice of cpp, we have
+$$
+\int \sum_{i=1}^n \left(\mbox{cpp}_i-\frac{\alpha+n_i}{\alpha+ \beta +\mbox{size}_i}\right)^2 f(n;\mbox{cpp}) dn \leq \int \sum_{i=1}^n \left(\mbox{cpp}_i-\frac{n_i}{\mbox{size}_i}\right)^2 f(n;\mbox{cpp}) dn 
+$$
+One should prove that
+$$
+\sum_{i=1}^n \left(\mbox{cpp}_i-\frac{\alpha+n_i}{\alpha+ \beta +\mbox{size}_i}\right)^2 \leq \sum_{i=1}^n \left(\mbox{cpp}_i-\frac{n_i}{\mbox{size}_i}\right)^2
+$$
+A sufficient condition for this is that for each $i$ we have 
+$$
+\left|\mbox{cpp}_i-\frac{\alpha+n_i}{\alpha+ \beta +\mbox{size}_i}\right| \leq \left|\mbox{cpp}_i-\frac{n_i}{\mbox{size}_i}\right|
+$$
+
+I have not tried this... Or maybe there is a counterexample where this is not true for a choice of cpp... Do you think is worth trying for the article? 
