@@ -8,11 +8,17 @@ simulate_towns <- function(n) {
   as_tibble(ret)
 }
 
-# draw from the poisson w/ rate = cpp for each town
+
 simulate_crimes <- function(population, cpp) {
-  rates <- population*cpp
-  aaply(rates, 1, function (x) rpois(1, x))
+
+  # draw from the poisson w/ rate = cpp for each town
+  #  rates <- population*cpp
+  #  aaply(rates, 1, function (x) rpois(1, x))
+
+  # draw from binomial(population city,cpp city)
+  aapply(rates,1, function (x) rbinom(1,population,cpp))
 }
+
 
 # total no. crime reports by year
 total_crime <- function() {
