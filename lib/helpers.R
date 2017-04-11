@@ -9,14 +9,14 @@ simulate_towns <- function(n) {
 }
 
 
-simulate_crimes <- function(population, cpp) {
-
-  # draw from the poisson w/ rate = cpp for each town
-  #  rates <- population*cpp
-  #  aaply(rates, 1, function (x) rpois(1, x))
-
-  # draw from binomial(population city,cpp city)
-  aapply(rates,1, function (x) rbinom(1,population,cpp))
+simulate_crimes <- function(population, cpp, law='poisson') {
+  if(law=='poisson'){ # draw from the poisson w/ rate = cpp for each town
+    rates <- population*cpp
+    return(aaply(rates, 1, function (x) rpois(1, x)))
+  }
+  if(law=='binomial'){ # draw from binomial(population city,cpp city)
+    return(rbinom(n=length(population),size=population,prob=cpp))
+  }
 }
 
 
