@@ -199,4 +199,27 @@ $$
 \left|\mbox{cpp}_i-\frac{\alpha+n_i}{\alpha+ \beta +\mbox{size}_i}\right| \leq \left|\mbox{cpp}_i-\frac{n_i}{\mbox{size}_i}\right|
 $$
 
-I have not tried this... Or maybe there is a counterexample where this is not true for a choice of cpp... Do you think is worth trying for the article? 
+I have not tried this... Or maybe there is a counterexample where this is not true for a choice of cpp... For instance take all $n_i=0$ for all $i=1,\ldots,m-1 $and $n_m=\mbox{size}_m$? Do you think is worth trying for the article? 
+
+## A counterexample?
+
+Take $\mbox{cpp}=$ 1 in Berg (say) and 0 elsewhere. 
+
+- Try to show theoretically that in this case $R(\mbox{cpp},\hat{\mbox{cpp}^s}) > R(\mbox{cpp},\hat{\mbox{cpp}})$?
+- Problem with the empirical approach: we cannot take $n_m=\mbox{size}_m$ because when sampling it the number of reports can be larger than size. If we take $n_m$ slighter smaller than $\mbox{size}_m$ then it looks like that $R(\mbox{cpp},\hat{\mbox{cpp}^s}) > R(\mbox{cpp},\hat{\mbox{cpp}})$ but with overlapping confidence intervals even with large $N$.
+
+```{r,eval=F}
+y <- c(rep(0,347),3470) 
+N=200
+sim=c()
+for(i in 1:N) sim=cbind(sim,rpois(n=348,lambda=y))
+raw_est <- apply(sim,2,function(x) x/violence14$personer ) 
+loss_raw_est <- apply(raw_est,2,function(x) sum((x-violence14$cpp)^2) ) 
+risk_raw <- mean(loss_raw_est)
+risk_raw + c(-1,0,1) * 1.96 * sqrt(risk_raw*(1-risk_raw)/N)
+shrink_est <-c()
+for(i in 1:N) shrink_est <- cbind(shrink_est,shrink(ncrimes=sim[,i],pop=violence14$personer))
+L_shrink_est <- apply(shrink_est,2,function(x) sum((x-violence14$cpp)^2)) 
+risk_shrink <- mean(L_shrink_est)
+risk_shrink + c(-1,0,1) * 1.96 * sqrt(risk_shrink*(1-risk_shrink)/N)
+```
