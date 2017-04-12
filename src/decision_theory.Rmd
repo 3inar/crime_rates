@@ -4,6 +4,14 @@ date: "11 February 2017"
 output: pdf_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir="..")
+```
+```{r, include=F}
+library(ProjectTemplate); load.project()  # load project
+```
+
 I use the same notations as in the Overleaf draft and in the 'Decision theory' chapter of Wasserman's 'All of Statistics'.
 
 # 1. Theoretical considerations
@@ -111,7 +119,7 @@ crimes <- left_join(v, p)
 # filter out anything that isn't violence in 2014. Additionally, some of the
 # entries have population 0, so let's remove them. Order by crimes/1000,
 # descending
-violence14 <- crimes %>% filter(tid=="2014", lovbruddstype=="Voldskriminalitet") %>%
+violence14 <- crimes %>% filter(tid=="2014", lovbruddstype=="¬ Vold og mishandling") %>%
               filter(sted != "Alle kommuner", personer > 0) %>%
               select(-lovbruddstype, -tid) %>% 
               na.omit %>% 
