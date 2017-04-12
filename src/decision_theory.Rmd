@@ -4,6 +4,14 @@ date: "11 February 2017"
 output: pdf_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir="..")
+```
+```{r, include=F}
+library(ProjectTemplate); load.project()  # load project
+```
+
 I use the same notations as in the Overleaf draft and in the 'Decision theory' chapter of Wasserman's 'All of Statistics'.
 
 # 1. Theoretical considerations
