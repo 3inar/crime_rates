@@ -1,0 +1,82 @@
+---
+title: "Simulations using binomial"
+output:
+  pdf_document: default
+date: "11 avril 2017"
+---
+
+Same notations as in the overleaf draft.
+
+
+```{r setup, include=FALSE}
+# not possible to knit without this chunk
+knitr::opts_chunk$set(echo = TRUE) 
+knitr::opts_knit$set(root.dir="..")
+```
+
+```{r, include=FALSE}
+# load project
+library(ProjectTemplate); load.project()  
+```
+
+For $j=1,\ldots,Nsim$: 
+
+1. simulate $(k_i)_i$
+2. calculate $(\theta_i)_i$ and $(\theta_i^s)_i$
+3. calculate __global loss functions__ $L(\theta_i,\hat\theta_i)=\sum_i(\theta_i - \hat\theta_i)^2$ and  $L(\theta_i,\theta_i^s)=\sum_i(\theta_i - \hat\theta_i^s)^2$
+
+Then we calculate MC estimates of the risks $E[L(\theta_i,\hat\theta_i)]$ and $E[L(\theta_i,\hat\theta_i^s)]$ together with 95% asymptotic confidence intervals.
+
+```{r}
+towns <- mean_crimes()
+Nsim=1E5
+errors <- raply(Nsim, {
+  towns %<>% mutate(crimes=simulate_crimes(towns$population, towns$cpp, law='binomial'), raw_est=crimes/population)
+  
+  mu <- mean(towns$raw_est)
+  sigsq <- var(towns$raw_est)
+  alpha_p <- ((1 - mu) / sigsq - 1 / mu) * mu ^ 2
+  beta_p <- alpha_p * (1 / mu - 1)
+  
+  towns %<>% mutate(smoothed_est=(crimes+alpha_p)/(population+alpha_p+beta_p))
+  
+  qerror_raw <- sum((towns$raw_est - towns$cpp)^2)  #mean((towns$raw_est - towns$cpp)^2) 
+  cor_raw <- cor(towns$raw_est, towns$cpp, method = 'spearman')
+
+  qerror_smooth <- sum((towns$smoothed_est - towns$cpp)^2) #mean((towns$smoothed_est - towns$cpp)^2)
+  cor_smooth <- cor(towns$smoothed_est, towns$cpp, method = 'spearman')
+
+  c(qerror_raw, qerror_smooth, cor_raw, cor_smooth)
+})
+
+qrisk_raw <- mean(errors[,1])
+
+qrisk_smooth <- mean(errors[,2])
+
+av_cor_raw <- mean(errors[,3])
+
+av_cor_smooth <- mean(errors[,4])
+
+plot(density(errors[,2]), col="red")
+abline(v=mean(errors[, 2]), col="red")
+
+lines(density(errors[, 1]))
+abline(v=mean(errors[, 1]))
+```
+
+Table woth results:
+
+```{r, warning=FALSE,message=FALSE}
+require(knitr)
+rbind(Quad_risk_raw=qrisk_raw + qnorm(0.05/2)*sd(errors[,1])/sqrt(Nsim) * c(1, 0, -1),
+      Quad_risk_smoothed=qrisk_smooth + qnorm(0.05/2)*sd(errors[,2])/sqrt(Nsim) * c(1, 0, -1),
+      Corr_raw=av_cor_raw + qnorm(0.05/2)*sd(errors[,3])/sqrt(Nsim) * c(1, 0, -1),
+      Corr_smoothed=av_cor_smooth + qnorm(0.05/2)*sd(errors[,4])/sqrt(Nsim) * c(1, 0, -1)
+      ) %>% kable(col.names=c('lower', 'mean', 'upper'), 
+                  caption=paste('0.95 CI,',Nsim,'simulations.'))
+```
+
+To do: 
+
+- Correlation analysis: Not the result I was expecting 
+- Here we estimate MSE. Shall we also look at the ASE and RMSE? 
