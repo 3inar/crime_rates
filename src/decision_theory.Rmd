@@ -119,7 +119,7 @@ crimes <- left_join(v, p)
 # filter out anything that isn't violence in 2014. Additionally, some of the
 # entries have population 0, so let's remove them. Order by crimes/1000,
 # descending
-violence14 <- crimes %>% filter(tid=="2014", lovbruddstype=="Voldskriminalitet") %>%
+violence14 <- crimes %>% filter(tid=="2014", lovbruddstype=="¬ Vold og mishandling") %>%
               filter(sted != "Alle kommuner", personer > 0) %>%
               select(-lovbruddstype, -tid) %>% 
               na.omit %>% 
