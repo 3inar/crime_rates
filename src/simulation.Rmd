@@ -75,7 +75,6 @@ abline(v=mean(errors[, 2]), col="red")
 lines(density(errors[, 1]))
 abline(v=mean(errors[, 1]))
 ```
-Smoothed estimates in red, there is evidence that, on average, there's 
-a lower error for the smoothing. 
+Smoothed estimates in red, these are the same!
 
 

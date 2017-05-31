@@ -1,6 +1,6 @@
 # simulate n towns from the norwegian_crime data
 simulate_towns <- function(n) {
-  popc <- median_crimes()
+  popc <- mean_crimes()
   ret <- cbind(sample(popc$population, n, replace=T),
                sample(popc$cpp, n, replace=T))
   colnames(ret) <- c("population", "cpp")

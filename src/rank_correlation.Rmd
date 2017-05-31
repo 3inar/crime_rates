@@ -29,7 +29,7 @@ ranks <- raply(10000, {
   towns %<>% mutate(smoothed_est=(crimes+alpha_p)/(population+alpha_p+beta_p))
   
   cor_raw <- cor(towns$raw_est, towns$cpp, method="spearman")
-  cor_smooth <- cor(towns$smoothed_est, towns$cpp)
+  cor_smooth <- cor(towns$smoothed_est, towns$cpp, method="spearman")
   c(raw=cor_raw, smooth=cor_smooth)
 })
 
