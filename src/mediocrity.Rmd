@@ -108,4 +108,4 @@ Rather then comparing the slopes of the regression lines, we can compare the cor
 cor(years$`2012`,years$`2013`,use='complete')
 cor(years$`2012s`,years$`2013s`,use='complete')
 ```
-This is not proper testing, but it is very reasonable because outliers are pushed towards the other point by the shrinking. 
+This is not proper testing, but it is very reasonable because outliers are pushed towards the other points by the shrinking. 
