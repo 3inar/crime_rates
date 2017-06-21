@@ -22,7 +22,9 @@ simulate_crimes <- function(population, cpp, law='poisson') {
 
 # total no. crime reports by year
 total_crime <- function() {
-  norwegian_crime %>% filter(crime_type == "¬ Vold og mishandling") %>% group_by(place,year,population) %>% summarise(reports=sum(reports)) %>% ungroup
+  norwegian_crime %>% group_by(place,year,population)  %>%
+    filter(crime_type == "¬ Vold og mishandling") %>% #Only violent crimes!
+    summarise(reports=sum(reports)) %>% ungroup
 }
 
 # median total crime rate for all years, 2014 population
@@ -35,5 +37,7 @@ mean_crimes <- function() {
               filter(year=="2014") %>% group_by(place, population) %>%
               summarise() %>% ungroup
 
-  left_join(pops2014, mediancrime) %>% transmute(population, cpp=rate)
+ left_join(pops2014, mediancrime) %>%
+   mutate(rate=replace(rate,is.na(rate),0)) %>% #Because some cities have no violent crime reported
+   transmute(population, cpp=rate)
 }

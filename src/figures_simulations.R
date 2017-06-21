@@ -3,6 +3,10 @@
 library(ProjectTemplate); load.project()
 
 # Funnel plot with one simulated dataset
+
+towns <- mean_crimes()
+towns %<>% mutate(crimes=simulate_crimes(towns$population, towns$cpp, law='binomial'), raw_est=crimes/population)
+
 rates_sim <- towns %>% mutate(crimes=simulate_crimes(towns$population, towns$cpp, law='binomial'),
                              raw_est=crimes/population) %>%
             transmute(population/1000,raw_est)
@@ -41,9 +45,10 @@ errors <- raply(Nsim, {
   c(qerror_raw, qerror_smooth, cor_raw, cor_smooth)
 })
 
-
 pdf(file="figures/loss.pdf", width=6, height=5)
-plot(density(errors[,2]), type='n',
+plot(density(errors[,2]),type='n',
+     xlim=c(min(errors[,2]),max(errors[,1])),
+     ylim=c(0,8000),
      main='Distribution over all MC simulations',
      xlab='Loss',
      cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.2)
@@ -58,5 +63,5 @@ legend(x='topright', bty='n', lwd=2, lty=1:2, col=1:2, legend=c('Raw estimate', 
 
 dev.off()
 
-mean(errors[,1]) %>% round(4)
-mean(errors[,2]) %>% round(4)
+mean(errors[,1]) %>% round(5)
+mean(errors[,2]) %>% round(5)
