@@ -22,7 +22,7 @@ simulate_crimes <- function(population, cpp, law='poisson') {
 
 # total no. crime reports by year
 total_crime <- function() {
-  norwegian_crime %>% group_by(place,year,population) %>% summarise(reports=sum(reports)) %>% ungroup
+  norwegian_crime %>% filter(crime_type == "¬ Vold og mishandling") %>% group_by(place,year,population) %>% summarise(reports=sum(reports)) %>% ungroup
 }
 
 # median total crime rate for all years, 2014 population
