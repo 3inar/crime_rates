@@ -1,12 +1,13 @@
 # simulate n towns from the norwegian_crime data
-simulate_towns <- function(n) {
-  popc <- mean_crimes()
-  ret <- cbind(sample(popc$population, n, replace=T),
-               sample(popc$cpp, n, replace=T))
-  colnames(ret) <- c("population", "cpp")
-
-  as_tibble(ret)
-}
+# simulate_towns <- function(n, crime="¬ Vold og mishandling") {
+#   popc <- mean_crimes(crime)
+#   n <- length(popc)
+#   ret <- cbind(sample(popc$population, n, replace=T),
+#                sample(popc$cpp, n, replace=T))
+#   colnames(ret) <- c("population", "cpp")
+#
+#   as_tibble(ret)
+# }
 
 
 simulate_crimes <- function(population, cpp, law='poisson') {
