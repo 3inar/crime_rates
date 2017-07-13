@@ -21,9 +21,9 @@ stats <- function(x) {
   tibble(ebayes_rate, ebayes_upper, ebayes_lower, standard_upper, standard_lower)
 }
 
-covered <- function(x) {
-  ebayes <- mean(x$rate > x$ebayes_lower & x$rate < x$ebayes_upper)
-  standard <- mean(x$rate > x$standard_lower & x$rate < x$standard_upper)
+covered <- function(x, true_rate) {
+  ebayes <- mean(true_rate > x$ebayes_lower & true_rate < x$ebayes_upper)
+  standard <- mean(true_rate > x$standard_lower & true_rate < x$standard_upper)
 
   c(ebayes_coverage=ebayes, standard_coverage=standard)
 }
@@ -34,7 +34,7 @@ experiment <- raply(1E4, function() {
   counts <- simulate_crimes(towns$population, towns$cpp, law="binomial")
   data <- tibble(rate=towns$cpp, population=towns$population, reports=counts)
   data <- as.tibble(cbind(data, stats(data)))
-  covered(data)
+    list(covered(data, towns$cpp), ctype)
 }, .progress="text")
 
 errors <- cbind(experiment[, 2], experiment[, 1])
