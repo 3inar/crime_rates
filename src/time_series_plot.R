@@ -6,24 +6,6 @@ pops2016 <- norwegian_crime %>% filter(crime_type == "¬ Vold og mishandling", y
   select(pop_2016=population, place)
 rates_all_years <- join(rates_all_years, pops2016)
 
-stats <- function(x) {
-  mu <- mean(x$rate)
-  sigsq <- var(x$rate)
-  alpha_p <- ((1 - mu) / sigsq - 1 / mu) * mu ^ 2
-  beta_p <- alpha_p * (1 / mu - 1)
-
-  alpha <- alpha_p+x$reports
-  beta=beta_p + x$population - x$reports
-  ebayes_rate <- (x$reports+alpha_p)/(x$population+alpha_p+beta_p)
-  ebayes_lower <- qbeta(0.025, alpha, beta)
-  ebayes_upper <- qbeta(0.975, alpha, beta)
-
-  band <- qnorm(0.975)*sqrt(x$rate*(1-x$rate)/x$population)
-  standard_upper <- x$rate+band
-  standard_lower <- x$rate-band
-
-  tibble(ebayes_rate, ebayes_upper, ebayes_lower, standard_upper, standard_lower)
-}
 
 shrinkage <- alply(unique(rates_all_years$year), 1, function(yr) {
   dat <- filter(rates_all_years, year==yr)

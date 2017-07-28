@@ -42,3 +42,22 @@ mean_crimes <- function(crime="¬ Vold og mishandling") {
    mutate(rate=replace(rate,is.na(rate),0)) %>% #Because some cities have no violent crime reported
    transmute(population, cpp=rate)
 }
+
+stats <- function(x) {
+  mu <- mean(x$rate)
+  sigsq <- var(x$rate)
+  alpha_p <- ((1 - mu) / sigsq - 1 / mu) * mu ^ 2
+  beta_p <- alpha_p * (1 / mu - 1)
+
+  alpha <- alpha_p+x$reports
+  beta=beta_p + x$population - x$reports
+  ebayes_rate <- (x$reports+alpha_p)/(x$population+alpha_p+beta_p)
+  ebayes_lower <- qbeta(0.025, alpha, beta)
+  ebayes_upper <- qbeta(0.975, alpha, beta)
+
+  band <- qnorm(0.975)*sqrt(x$rate*(1-x$rate)/x$population)
+  standard_upper <- x$rate+band
+  standard_lower <- x$rate-band
+
+  tibble(ebayes_rate, ebayes_upper, ebayes_lower, standard_upper, standard_lower)
+}
