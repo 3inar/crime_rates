@@ -70,6 +70,7 @@ pdf(file="sticks.pdf", width=6, height=5)
 plot(rate_limit, c(1,2), type="n", main="Shrinkage vs ordinary estimates",
      yaxt="n", ylab="", xlab="Crime rate estimate",
      cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.2)
+axis(2, at=1:2, labels=c("MLE", "EB"), las=1, tick=F, cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.2)
 a_ply(x, 1, function(r) {
   color <- ifelse(r$place, "black", "grey")
   rates <- c(r$rate, r$ebayes_rate)
