@@ -43,9 +43,10 @@ errors <- raply(Nsim, {
   cor_smooth <- cor(towns$smoothed_est, towns$cpp, method = 'spearman')
 
   c(qerror_raw, qerror_smooth, cor_raw, cor_smooth)
-})
+}, .progress="text")
 
-pdf(file="figures/loss.pdf", width=6, height=5)
+pdf(file="loss.pdf", width=6, height=5)
+bwd <- 0.00001
 plot(density(errors[,2]),type='n',
      xlim=c(min(errors[,2]),max(errors[,1])),
      ylim=c(0,8000),
@@ -53,13 +54,13 @@ plot(density(errors[,2]),type='n',
      xlab='Loss',
      cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.2)
 
-lines(density(errors[, 1]),lwd=2)
+lines(density(errors[, 1], bw=bwd),lwd=2)
 abline(v=mean(errors[, 1]),lwd=2)
 
-lines(density(errors[, 2]),lwd=2, col=2,lty=2)
+lines(density(errors[, 2], bw=bwd),lwd=2, col=2,lty=2)
 abline(v=mean(errors[, 2]),lwd=2, col=2, lty=2)
 
-legend(x='topright', bty='n', lwd=2, lty=1:2, col=1:2, legend=c('Raw estimate', 'EB shrinkage'))
+legend(x='topright', bty='n', lwd=2, lty=1:2, col=1:2, legend=c('MLE', 'EB'))
 
 dev.off()
 
