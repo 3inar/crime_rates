@@ -50,7 +50,7 @@ bwd <- 0.00001
 plot(density(errors[,2]),type='n',
      xlim=c(min(errors[,2]),max(errors[,1])),
      ylim=c(0,8000),
-     main='Distribution over all MC simulations',
+     main='MC estimates of risk',
      xlab='Loss',
      cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.2)
 

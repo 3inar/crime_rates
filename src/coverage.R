@@ -29,8 +29,8 @@ pdf(file="coverage.pdf", width=6, height=5)
 plot(density(errors[,2]),type='n',
      xlim=c(0.86, 0.96),
      ylim=c(0,45),
-     main='Distribution over all MC simulations',
-     xlab='Coverage probability',
+     main='MC estimates of coverage probability',
+     xlab='Coverage',
      cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.2)
 
 
