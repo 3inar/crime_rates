@@ -1,1 +1,2 @@
-Here you'll store your raw data files. If they are encoded in a supported file format, they'll automatically be loaded when you call `load.project()`.
+The script in this folder queries Statistics Norway for the two data sets we need:
+crime reports and population numbers. The URLs for the data sets can be found found on [ssb.no](http://ssb.no/).
