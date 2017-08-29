@@ -11,7 +11,6 @@ covered <- function(x, true_rate) {
 crime_type <- "¬ Vold og mishandling"
 nsim <- 1E5
 
-# experiment <- alply(crime_types, 1, function(ctype) {
 towns <- mean_crimes(crime_type)
 experiment <-  raply(nsim, function() {
   counts <- simulate_crimes(towns$population, towns$cpp, law="binomial")
@@ -19,8 +18,6 @@ experiment <-  raply(nsim, function() {
   data <- as.tibble(cbind(data, stats(data)))
   covered(data, towns$cpp)
 }, .progress="text")
-# }, .progress="text")
-
 
 
 errors <- experiment
