@@ -5,6 +5,7 @@ library(stringr)
 # ------------------------------------------------------------------------------
 
 # colnames have the format [long table name].variable, extract the last bit
+colnames(crime_reports)[3] <- "tid"
 colnames(crime_reports) <- gsub("^(.*[.])", "", colnames(crime_reports))
 
 # crime reports and reports/1000 people are in the same column. I'll simply drop
