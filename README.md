@@ -13,6 +13,7 @@ analysis projects. To load this project, you'll first need to `setwd()` into the
 where this README file is located. Then you need to run the following two
 lines of R code:
 
+	install.packages('ProjectTemplate')     # if you do not already have the package
 	library('ProjectTemplate')
 	load.project()
 
