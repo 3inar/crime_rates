@@ -40,3 +40,32 @@ points(rates_2016_2015, pch=20)
 dev.off()
 
 
+# histogram of 2016 rates with prior overlaid
+
+# method of moments alpha & beta
+mu <- mean(rates_2016$rate)
+sigsq <- var(rates_2016$rate)
+alpha_p <- ((1 - mu) / sigsq - 1 / mu) * mu ^ 2
+beta_p <- alpha_p * (1 / mu - 1)
+
+
+pdf(file="rate_histogram.pdf", width=6, height=5)
+
+hist(rates_2016$rate, nclass=20, col="grey", border = "white",
+     main="Pooled violent crime rates, 2016",
+     xlab="Rate",
+     cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.2, probability = T)
+curve(dbeta(x, alpha_p, beta_p), lwd=2, add = T, col="black")
+
+dev.off()
+
+# qq plot
+pdf(file="qqplot.pdf", width=6, height=5)
+set.seed(20180801)
+qqplot(rbeta(500, alpha_p, beta_p), rates_2016$rate, pch=19, col="grey",
+       main="Q-Q plot of 2016 rates against fitted prior",
+       xlab="Prior quantiles",
+       ylab="Empirical 2016 quantiles",
+       cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.2)
+qqline(rates_2016$rate, distribution = function(p) qbeta(p, alpha_p, beta_p), col = "black", lwd=2)
+dev.off()
