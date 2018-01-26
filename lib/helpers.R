@@ -48,5 +48,20 @@ stats <- function(x) {
   standard_upper <- x$rate+band
   standard_lower <- x$rate-band
 
+
+
   tibble(ebayes_rate, ebayes_upper, ebayes_lower, standard_upper, standard_lower)
+}
+
+jse <- function(rate, population, tomean=T) {
+  vars <- rate*(1-rate)/population
+  pooled_var <- sum(vars*(population - 1))/sum(population - 1)
+
+  if(tomean) {
+    origin <- mean(rate)
+  } else {
+    origin <- 0
+  }
+  sfactor <- (1 - (length(rate) - 2)*pooled_var/sum((rate - origin)^2))
+  origin + (rate - origin)*sfactor
 }
