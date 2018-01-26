@@ -1,5 +1,6 @@
 # data associated with article publication
-load('src/data/norwegian_crime.rda')
+library(ProjectTemplate); load.project()
+load('src/data/norwegian_crime.rda')   # use backup data in case ssb scheme changes
 
 rates_2016 <- norwegian_crime %>% filter(crime_type == "¬ Vold og mishandling", year=="2016") %>%
   transmute(population/1000, rate=reports/population)
@@ -28,7 +29,7 @@ limits <- c(min(rates_2016_2015), max(rates_2016_2015))
 
 # regression to the mean figure
 pdf(file="regression.pdf", width=6, height=5)
-plot(rates_2016_2015, type="n", main="Regression to the mean",
+plot(rates_2016_2015, type="n", main="Crime rates regress to the mean",
      sub=paste0("(correlation = ", signif(correlation, 2),")"),
      xlim=limits, ylim=limits,
      cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.2)
