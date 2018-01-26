@@ -70,3 +70,35 @@ qqplot(rbeta(500, alpha_p, beta_p), rates_2016$rate, pch=19, col="black",
        cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.2)
 qqline(rates_2016$rate, distribution = function(p) qbeta(p, alpha_p, beta_p), col = "black", lwd=2)
 dev.off()
+
+
+# analysis of alpha, beta
+pdf(file="information.pdf", width=6, height=5)
+rates_2016_2 <- norwegian_crime %>% filter(crime_type == "¬ Vold og mishandling", year=="2016") %>%
+transmute(population, rate=reports/population, reports) %>% arrange(population)
+
+with(rates_2016_2, {
+  plot(log10(population), (alpha_p + reports)/reports, pch=19, col="grey",
+       main="Relative information from shrinkage",
+       xlab=expression(paste(log[10], " population")),
+       ylab= "Relative information",
+       cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.2)
+  points(log10(population), (beta_p + population - reports)/(population-reports), pch=19, col="black")
+})
+dev.off()
+
+# size of shrinkage
+pdf(file="adjustment.pdf", width=6, height=5)
+with(rates_2016_2, {
+  plot(log10(population), (population*(alpha_p + reports))/(reports*(alpha_p+beta_p+population)),
+       pch=19, col="black",
+       main="Estimate adjustment from shrinkage",
+       xlab=expression(paste(log[10], " population")),
+       ylab= "Shrinkage factor",
+       cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.2)
+  #
+  # min(population)
+  # min(reports)
+})
+dev.off()
+
