@@ -19,7 +19,6 @@ experiment <-  raply(nsim, function() {
   covered(data, towns$cpp)
 }, .progress="text")
 
-
 errors <- experiment
 
 pdf(file="coverage.pdf", width=6, height=5)
@@ -40,6 +39,6 @@ abline(v=mean(errors[, 1]),lwd=2, col=2, lty=2)
 
 
 abline(v=0.95,lwd=2, col="grey")
-legend(x='topleft', bty='n', lwd=2, lty=1:2, col=1:2, legend=c('Standard Wald', 'EB credible'))
+legend(x='topleft', bty='n', lwd=2, lty=1:2, col=1:2, legend=c('Wald', 'Credible'))
 
 dev.off()
