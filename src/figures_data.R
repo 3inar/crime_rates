@@ -63,7 +63,7 @@ dev.off()
 # qq plot
 pdf(file="qqplot.pdf", width=6, height=5)
 set.seed(20180801)
-qqplot(rbeta(500, alpha_p, beta_p), rates_2016$rate, pch=19, col="grey",
+qqplot(rbeta(500, alpha_p, beta_p), rates_2016$rate, pch=19, col="black",
        main="Q-Q plot of 2016 rates against fitted prior",
        xlab="Prior quantiles",
        ylab="Empirical 2016 quantiles",
